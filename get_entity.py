@@ -2,24 +2,40 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-files = ['annotated_wd_data_valid_answerable.txt'] #'annotated_wd_data_valid_answerable.txt', 'annotated_wd_data_test_answerable.txt']
+reload = True
+files = ['annotated_wd_data_train_answerable.txt'] #'annotated_wd_data_valid_answerable.txt', 'annotated_wd_data_test_answerable.txt']
 
 for file_name in files:
+
    print(f"### Working on {file_name}")
+   save_file = file_name.split(".txt")[0]
+   save_file = f"n_{save_file}.csv"
+   print(f"### Saving on {save_file}")
+
    e_base_url = "https://www.wikidata.org/wiki/"
    p_base_url = "https://www.wikidata.org/wiki/Property:"
    t_list = {'e1': [], 'p': [], 'e2': [], 'q': []} 
 
    f = open(file_name)
    lines = f.readlines()
+   if reload: 
+      _df = pd.read_csv(save_file)
+      p_linenum = len(list(_df['e1'])) 
+      lines = lines[p_linenum:]
    for line_num, line in enumerate(lines):
       
       if line_num % 100 == 0:
          debug = True
          print(f"---Working in {line_num}/{len(lines)}")
+         _df = pd.read_csv(save_file)
+         t_list['e1'] += list(_df['e1'])
+         t_list['p'] += list(_df['p'])
+         t_list['e2'] += list(_df['e2'])
+         t_list['q'] += list(_df['q'])
          df = pd.DataFrame(t_list)
-         df.to_csv(f"n_{file_name}")
-         print(f"Saving .. n_{file_name}")
+         df.to_csv(save_file)
+         print(f"Saving .. {save_file}, # of lines: {len(t_list['e1'])}")
+         t_list = {'e1': [], 'p': [], 'e2': [], 'q': []} 
 
       else:
          debug = False
@@ -71,7 +87,20 @@ for file_name in files:
       else:
          print(f"**!!*!*!*!*!*!*! ERROR|| ret: {ret}, extract: {extract}")
 
+   debug = True
+   print(f"---Working in {line_num}/{len(lines)}")
+   _df = pd.read_csv(save_file)
+   t_list['e1'] += list(_df['e1'])
+   t_list['p'] += list(_df['p'])
+   t_list['e2'] += list(_df['e2'])
+   t_list['q'] += list(_df['q'])
    df = pd.DataFrame(t_list)
-   df.to_csv(f"n_{file_name}")
+   df.to_csv(save_file)
+   print(f"Saving .. {save_file}, # of lines: {len(t_list['e1'])}")
+   
+   """
+   df = pd.DataFrame(t_list)
+   df.to_csv(f"{save_file}")
    print(f"Saving .. n_{file_name.split('.txt')[0]}.csv")
    print(f"total number: {len(lines)} to {len(t_list['e1'])}")
+   """
