@@ -9,6 +9,6 @@
   * 'e2'  : object
   * 'q'   : question
 
-* # of train set:   19478
-* # of val set:     2819
-* # of test set:    5621
+* number of train set:   19478
+* number of val set:     2819
+* number of test set:    5621
